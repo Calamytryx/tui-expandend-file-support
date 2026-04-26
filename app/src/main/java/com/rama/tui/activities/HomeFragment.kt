@@ -5,6 +5,8 @@ import android.app.Fragment
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,22 +14,32 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.ListView
+import android.widget.TextView
 import com.rama.tui.R
 import com.rama.tui.TrackAdapter
 import com.rama.tui.managers.MusicManager
-import android.text.Editable
-import android.text.TextWatcher
-import android.widget.TextView
 
 class HomeFragment : Fragment() {
 
     private lateinit var listView: ListView
     private lateinit var playPauseIcon: ImageView
     private lateinit var playPauseButton: FrameLayout
-    private lateinit var nextButton: FrameLayout
     private lateinit var prevButton: FrameLayout
+    private lateinit var nextButton: FrameLayout
+    private lateinit var repeatButton: FrameLayout
+    private lateinit var shuffleButton: FrameLayout
+    private lateinit var repeatIcon: ImageView
+    private lateinit var shuffleIcon: ImageView
     private lateinit var progressBg: View
     private lateinit var currentlyPlayingText: TextView
+
+    private val progressHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val progressRunnable = object : Runnable {
+        override fun run() {
+            updateProgress()
+            progressHandler.postDelayed(this, 500)
+        }
+    }
 
     companion object {
         private const val REQ_AUDIO = 1001
@@ -42,20 +54,34 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Bind views
         listView = view.findViewById(R.id.task_list)
         playPauseButton = view.findViewById(R.id.play_pause_button)
+        prevButton = view.findViewById(R.id.prev_button)
         nextButton = view.findViewById(R.id.next_button)
+        repeatButton = view.findViewById(R.id.repeat_button)
+        shuffleButton = view.findViewById(R.id.shuffle_button)
 
         playPauseIcon = playPauseButton.getChildAt(0) as ImageView
+        repeatIcon = repeatButton.getChildAt(0) as ImageView
+        shuffleIcon = shuffleButton.getChildAt(0) as ImageView
 
+        val nowPlaying = view.findViewById<FrameLayout>(R.id.currently_playing_display)
+        progressBg = nowPlaying.findViewById(R.id.progress_bg)
+        currentlyPlayingText = nowPlaying.getChildAt(1) as TextView
+
+        // Wire listeners
         playPauseButton.setOnClickListener { MusicManager.togglePlayPause() }
-        nextButton.setOnClickListener { MusicManager.next() }
-
-        val bar = nextButton.parent as ViewGroup
-        prevButton = bar.getChildAt(bar.indexOfChild(nextButton) - 1) as FrameLayout
         prevButton.setOnClickListener { MusicManager.prev() }
-
-        MusicManager.onStateChanged = { activity?.runOnUiThread { refreshUi() } }
+        nextButton.setOnClickListener { MusicManager.next() }
+        repeatButton.setOnClickListener {
+            MusicManager.isRepeat = !MusicManager.isRepeat
+            refreshUi()
+        }
+        shuffleButton.setOnClickListener {
+            MusicManager.isShuffle = !MusicManager.isShuffle
+            refreshUi()
+        }
 
         val filterInput = view.findViewById<EditText>(R.id.filter_input)
         val clearButton = view.findViewById<FrameLayout>(R.id.clear_button)
@@ -69,34 +95,29 @@ class HomeFragment : Fragment() {
                 (listView.adapter as? TrackAdapter)?.filter(s?.toString() ?: "")
             }
         })
+        clearButton.setOnClickListener { filterInput.text.clear() }
 
-        clearButton.setOnClickListener {
-            filterInput.text.clear()
-        }
+        MusicManager.onStateChanged = { activity?.runOnUiThread { refreshUi() } }
 
-        val nowPlaying = view.findViewById<FrameLayout>(R.id.currently_playing_display)
-        progressBg = nowPlaying.findViewById(R.id.progress_bg)
-        currentlyPlayingText = nowPlaying.getChildAt(1) as TextView
-
+        // Load data and start progress ticker
         loadOrRequestTracks()
+        progressHandler.post(progressRunnable)
     }
 
     override fun onDestroyView() {
         MusicManager.onStateChanged = null
+        progressHandler.removeCallbacks(progressRunnable)
         super.onDestroyView()
     }
 
     private fun loadOrRequestTracks() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-            MusicManager.hasPermission(activity)
-        ) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || MusicManager.hasPermission(activity)) {
             loadTracks()
         } else {
             val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
                 Manifest.permission.READ_MEDIA_AUDIO
             else
                 Manifest.permission.READ_EXTERNAL_STORAGE
-
             requestPermissions(arrayOf(permission), REQ_AUDIO)
         }
     }
@@ -106,9 +127,7 @@ class HomeFragment : Fragment() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if (requestCode == REQ_AUDIO &&
-            grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
-        ) {
+        if (requestCode == REQ_AUDIO && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
             loadTracks()
         }
     }
@@ -124,22 +143,24 @@ class HomeFragment : Fragment() {
             if (MusicManager.isPlaying) R.drawable.icon_pause_circle
             else R.drawable.icon_play_circle
         )
+        repeatIcon.alpha = if (MusicManager.isRepeat) 1f else 0.3f
+        shuffleIcon.alpha = if (MusicManager.isShuffle) 1f else 0.3f
 
         val track = MusicManager.currentTrack
         currentlyPlayingText.text = track?.let { "${it.displayArtists} — ${it.title}" } ?: "—"
-
-        progressBg.post {
-            val parent = progressBg.parent as View
-            val progress = if (MusicManager.tracks.isNotEmpty())
-                (MusicManager.currentIndex + 1).toFloat() / MusicManager.tracks.size
-            else 0f
-            progressBg.layoutParams.width = (parent.width * progress).toInt()
-            progressBg.requestLayout()
-        }
 
         (listView.adapter as? TrackAdapter)?.notifyDataSetChanged()
 
         val idx = MusicManager.currentIndex
         if (idx >= 0) listView.smoothScrollToPosition(idx)
+    }
+
+    private fun updateProgress() {
+        val progress = MusicManager.playerProgress() ?: return
+        progressBg.post {
+            val parent = progressBg.parent as View
+            progressBg.layoutParams.width = (parent.width * progress).toInt()
+            progressBg.requestLayout()
+        }
     }
 }

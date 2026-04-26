@@ -115,6 +115,12 @@ object MusicManager {
         onStateChanged?.invoke()
     }
 
+    fun playerProgress(): Float? {
+        val p = player ?: return null
+        if (p.duration <= 0) return null
+        return p.currentPosition.toFloat() / p.duration
+    }
+
     private fun onTrackFinished() {
         when {
             isRepeat && !isShuffle -> play(currentIndex)
