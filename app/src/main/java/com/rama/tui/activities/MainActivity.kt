@@ -5,6 +5,7 @@ import android.app.FragmentManager
 import android.os.Bundle
 import android.view.View
 import com.rama.tui.CsActivity
+import com.rama.tui.MediaPlaybackService
 import com.rama.tui.R
 import com.rama.tui.managers.FontManager
 import com.rama.tui.managers.MusicManager
@@ -18,6 +19,7 @@ class MainActivity : CsActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MusicManager.initMediaSession(this)
+        MusicManager.requestAudioFocus(this)
         setContentView(R.layout.activity_main)
 
         val root = findViewById<View>(R.id.root)
@@ -42,7 +44,10 @@ class MainActivity : CsActivity() {
     }
 
     override fun onDestroy() {
-        MusicManager.releaseMediaSession()
+        // Service keeps running for background playback, only stop it if not playing
+        if (!MusicManager.isPlaying) {
+            MediaPlaybackService.stop(this)
+        }
         super.onDestroy()
     }
 

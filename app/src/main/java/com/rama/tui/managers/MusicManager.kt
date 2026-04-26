@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Environment
 import android.view.KeyEvent
 import androidx.core.content.ContextCompat
+import com.rama.tui.MediaButtonReceiver
 import com.rama.tui.Track
 import java.io.File
 
@@ -18,6 +19,7 @@ object MusicManager {
 
     private var player: MediaPlayer? = null
     private var mediaSession: MediaSession? = null
+    private var audioFocusRequest: android.media.AudioFocusRequest? = null
 
     var tracks: List<Track> = emptyList()
         private set
@@ -34,13 +36,61 @@ object MusicManager {
     var isRepeat: Boolean = false
 
     var onStateChanged: (() -> Unit)? = null
+    var onNotificationChanged: (() -> Unit)? = null
+
+    private var appContext: Context? = null
 
     val currentTrack: Track? get() = tracks.getOrNull(currentIndex)
 
     // region Media Session
 
+    fun requestAudioFocus(context: Context) {
+        val am = context.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            audioFocusRequest = android.media.AudioFocusRequest.Builder(
+                android.media.AudioManager.AUDIOFOCUS_GAIN
+            ).setOnAudioFocusChangeListener { focus ->
+                when (focus) {
+                    android.media.AudioManager.AUDIOFOCUS_LOSS -> if (isPlaying) togglePlayPause()
+                    android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> if (isPlaying) togglePlayPause()
+                    android.media.AudioManager.AUDIOFOCUS_GAIN -> if (!isPlaying) togglePlayPause()
+                }
+            }.build().also { am.requestAudioFocus(it) }
+        } else {
+            @Suppress("DEPRECATION")
+            am.requestAudioFocus(
+                { focus ->
+                    when (focus) {
+                        android.media.AudioManager.AUDIOFOCUS_LOSS -> if (isPlaying) togglePlayPause()
+                        android.media.AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> if (isPlaying) togglePlayPause()
+                        android.media.AudioManager.AUDIOFOCUS_GAIN -> if (!isPlaying) togglePlayPause()
+                    }
+                },
+                android.media.AudioManager.STREAM_MUSIC,
+                android.media.AudioManager.AUDIOFOCUS_GAIN
+            )
+        }
+    }
+
     fun initMediaSession(context: Context) {
+        appContext = context.applicationContext
+        com.rama.tui.MediaPlaybackService.start(context)
+
         mediaSession = MediaSession(context, "TuiMediaSession").apply {
+            setMediaButtonReceiver(
+                android.app.PendingIntent.getBroadcast(
+                    context, 0,
+                    Intent(Intent.ACTION_MEDIA_BUTTON).apply {
+                        setClass(
+                            context,
+                            MediaButtonReceiver::class.java
+                        )
+                    },
+                    android.app.PendingIntent.FLAG_IMMUTABLE
+                )
+            )
+
             setCallback(object : MediaSession.Callback() {
                 override fun onPlay() {
                     if (!isPlaying) togglePlayPause()
@@ -97,7 +147,7 @@ object MusicManager {
                 .build()
         )
     }
-    
+
     // region Permissions
 
     fun hasPermission(context: Context?): Boolean {
@@ -166,6 +216,7 @@ object MusicManager {
         }
         isPlaying = true
         onStateChanged?.invoke()
+        onNotificationChanged?.invoke()
         updatePlaybackState()
     }
 
@@ -183,6 +234,7 @@ object MusicManager {
             isPlaying = true
         }
         onStateChanged?.invoke()
+        onNotificationChanged?.invoke()
         updatePlaybackState()
     }
 
