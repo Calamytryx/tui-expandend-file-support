@@ -2,10 +2,14 @@ package com.rama.tui.managers
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
+import android.media.session.MediaSession
+import android.media.session.PlaybackState
 import android.os.Build
 import android.os.Environment
+import android.view.KeyEvent
 import androidx.core.content.ContextCompat
 import com.rama.tui.Track
 import java.io.File
@@ -13,8 +17,12 @@ import java.io.File
 object MusicManager {
 
     private var player: MediaPlayer? = null
+    private var mediaSession: MediaSession? = null
 
     var tracks: List<Track> = emptyList()
+        private set
+
+    var allTracks: List<Track> = emptyList()
         private set
 
     var currentIndex: Int = -1
@@ -29,18 +37,68 @@ object MusicManager {
 
     val currentTrack: Track? get() = tracks.getOrNull(currentIndex)
 
-    var allTracks: List<Track> = emptyList()
-        private set
+    // region Media Session
 
-    fun setTracks(newTracks: List<Track>, index: Int = 0) {
-        tracks = newTracks
-        play(index)
+    fun initMediaSession(context: Context) {
+        mediaSession = MediaSession(context, "TuiMediaSession").apply {
+            setCallback(object : MediaSession.Callback() {
+                override fun onPlay() {
+                    if (!isPlaying) togglePlayPause()
+                }
+
+                override fun onPause() {
+                    if (isPlaying) togglePlayPause()
+                }
+
+                override fun onSkipToNext() {
+                    next()
+                }
+
+                override fun onSkipToPrevious() {
+                    prev()
+                }
+
+                override fun onMediaButtonEvent(mediaButtonIntent: Intent): Boolean {
+                    val event =
+                        mediaButtonIntent.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)
+                    if (event?.action == KeyEvent.ACTION_DOWN) {
+                        when (event.keyCode) {
+                            KeyEvent.KEYCODE_MEDIA_PLAY -> onPlay()
+                            KeyEvent.KEYCODE_MEDIA_PAUSE -> onPause()
+                            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> togglePlayPause()
+                            KeyEvent.KEYCODE_MEDIA_NEXT -> next()
+                            KeyEvent.KEYCODE_MEDIA_PREVIOUS -> prev()
+                        }
+                    }
+                    return true
+                }
+            })
+            isActive = true
+        }
     }
 
-    fun seekTo(fraction: Float) {
-        val p = player ?: return
-        p.seekTo((p.duration * fraction.coerceIn(0f, 1f)).toInt())
+    fun releaseMediaSession() {
+        mediaSession?.release()
+        mediaSession = null
     }
+
+    private fun updatePlaybackState() {
+        val state = if (isPlaying) PlaybackState.STATE_PLAYING else PlaybackState.STATE_PAUSED
+        mediaSession?.setPlaybackState(
+            PlaybackState.Builder()
+                .setState(state, player?.currentPosition?.toLong() ?: 0L, 1f)
+                .setActions(
+                    PlaybackState.ACTION_PLAY or
+                            PlaybackState.ACTION_PAUSE or
+                            PlaybackState.ACTION_PLAY_PAUSE or
+                            PlaybackState.ACTION_SKIP_TO_NEXT or
+                            PlaybackState.ACTION_SKIP_TO_PREVIOUS
+                )
+                .build()
+        )
+    }
+    
+    // region Permissions
 
     fun hasPermission(context: Context?): Boolean {
         if (context == null) return false
@@ -56,6 +114,8 @@ object MusicManager {
             permission
         ) == PackageManager.PERMISSION_GRANTED
     }
+
+    // region Track Loading
 
     fun loadTracks(context: Context): Boolean {
         if (!hasPermission(context)) return false
@@ -74,6 +134,7 @@ object MusicManager {
         context.getExternalFilesDirs(Environment.DIRECTORY_MUSIC)
             .filterNotNull()
             .forEach { appSpecificDir ->
+                // Path: /storage/<id>/Android/data/<pkg>/files/Music — 5 levels up = volume root
                 val volumeRoot =
                     appSpecificDir.parentFile?.parentFile?.parentFile?.parentFile?.parentFile
                 val musicDir = volumeRoot?.let { File(it, Environment.DIRECTORY_MUSIC) }
@@ -90,6 +151,8 @@ object MusicManager {
             ?.sortedBy { it.title.lowercase() }
             ?: emptyList()
 
+    // region Playback Control
+
     fun play(index: Int = currentIndex) {
         if (tracks.isEmpty() || index !in tracks.indices) return
         currentIndex = index
@@ -103,6 +166,7 @@ object MusicManager {
         }
         isPlaying = true
         onStateChanged?.invoke()
+        updatePlaybackState()
     }
 
     fun togglePlayPause() {
@@ -119,6 +183,7 @@ object MusicManager {
             isPlaying = true
         }
         onStateChanged?.invoke()
+        updatePlaybackState()
     }
 
     fun next() {
@@ -137,17 +202,24 @@ object MusicManager {
         play(currentIndex)
     }
 
+    fun seekTo(fraction: Float) {
+        val p = player ?: return
+        p.seekTo((p.duration * fraction.coerceIn(0f, 1f)).toInt())
+    }
+
     fun release() {
         player?.release()
         player = null
         isPlaying = false
         onStateChanged?.invoke()
+        updatePlaybackState()
     }
 
-    fun playerProgress(): Float? {
-        val p = player ?: return null
-        if (p.duration <= 0) return null
-        return p.currentPosition.toFloat() / p.duration
+    // region Track Management
+
+    fun setTracks(newTracks: List<Track>, index: Int = 0) {
+        tracks = newTracks
+        play(index)
     }
 
     fun shuffleTracks() {
@@ -160,6 +232,14 @@ object MusicManager {
         currentIndex = 0
         onStateChanged?.invoke()
     }
+
+    fun playerProgress(): Float? {
+        val p = player ?: return null
+        if (p.duration <= 0) return null
+        return p.currentPosition.toFloat() / p.duration
+    }
+
+    // region Internal
 
     private fun onTrackFinished() {
         when {

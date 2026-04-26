@@ -7,6 +7,7 @@ import android.view.View
 import com.rama.tui.CsActivity
 import com.rama.tui.R
 import com.rama.tui.managers.FontManager
+import com.rama.tui.managers.MusicManager
 import com.rama.tui.widgets.WdNavbar
 
 class MainActivity : CsActivity() {
@@ -16,6 +17,7 @@ class MainActivity : CsActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MusicManager.initMediaSession(this)
         setContentView(R.layout.activity_main)
 
         val root = findViewById<View>(R.id.root)
@@ -37,6 +39,11 @@ class MainActivity : CsActivity() {
                 ?: WdNavbar.Page.HOME
             navbar.setActivePage(currentPage)
         }
+    }
+
+    override fun onDestroy() {
+        MusicManager.releaseMediaSession()
+        super.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
