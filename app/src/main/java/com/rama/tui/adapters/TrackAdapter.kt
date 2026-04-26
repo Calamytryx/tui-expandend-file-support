@@ -26,22 +26,13 @@ class TrackAdapter(
 
         view.findViewById<TextView>(R.id.track_title).text = track.title
         view.findViewById<TextView>(R.id.track_artist).text =
-            if (track.displayArtists.isNotEmpty())
-                track.artists.joinToString(", ")
-            else
-                "---"
+            track.displayArtists.ifEmpty { "---" }
 
         view.findViewById<TextView>(R.id.track_country).text =
-            if (track.displayCountries.isNotEmpty())
-                track.countries.joinToString(", ")
-            else
-                "---"
+            track.displayCountries.ifEmpty { "---" }
 
         view.findViewById<TextView>(R.id.track_lang).text =
-            if (track.displayLanguages.isNotEmpty())
-                track.languages.joinToString(", ")
-            else
-                "---"
+            track.displayLanguages.ifEmpty { "---" }
 
         // Highlight currently playing row
         val isActive = position == MusicManager.currentIndex
