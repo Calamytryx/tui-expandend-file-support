@@ -162,7 +162,7 @@
         android:layout_marginBottom="8sp"
         android:layout_height="wrap_content"
         android:background="@color/danger"
-        android:text="Delete song" />
+        android:text="Delete track" />
 
     <com.rama.tui.widgets.WdButton
         android:id="@+id/update_button"
@@ -170,7 +170,7 @@
         android:layout_marginBottom="8sp"
         android:layout_height="wrap_content"
         android:background="@color/button_secondary_color"
-        android:text="Update song" />
+        android:text="Update track" />
 
     <com.rama.tui.widgets.WdButton
         android:id="@+id/cancel_button"

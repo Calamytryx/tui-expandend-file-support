@@ -120,7 +120,7 @@ object TrackEditDialog {
         deleteSongBtn.setOnClickListener {
             val deleted = track.file.delete()
             if (deleted) {
-                Toast.makeText(activity, "Song deleted", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, "Track deleted", Toast.LENGTH_SHORT).show()
                 onChanged()
                 dialog.dismiss()
             } else {
@@ -156,7 +156,7 @@ object TrackEditDialog {
             val newFile = File(track.file.parent, "$newName.${track.ext}")
             val renamed = track.file.renameTo(newFile)
             if (renamed) {
-                Toast.makeText(activity, "Song updated", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, "Track updated", Toast.LENGTH_SHORT).show()
                 onChanged()
                 dialog.dismiss()
             } else {
