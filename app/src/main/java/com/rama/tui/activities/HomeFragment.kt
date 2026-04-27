@@ -17,6 +17,7 @@ import android.widget.ListView
 import android.widget.TextView
 import com.rama.tui.R
 import com.rama.tui.TrackAdapter
+import com.rama.tui.activities.TrackEditDialog
 import com.rama.tui.managers.MusicManager
 
 class HomeFragment : Fragment() {
@@ -149,7 +150,20 @@ class HomeFragment : Fragment() {
 
     private fun loadTracks() {
         MusicManager.loadTracks(activity)
-        listView.adapter = TrackAdapter(activity, MusicManager.tracks)
+        listView.adapter = TrackAdapter(activity, MusicManager.tracks) { track ->
+            TrackEditDialog.show(activity, track) {
+                // Reload library after rename / delete / metadata strip
+                MusicManager.loadTracks(activity)
+                (listView.adapter as? TrackAdapter)?.let { adapter ->
+                    adapter.updateTracks(MusicManager.tracks)
+                } ?: run {
+                    listView.adapter = TrackAdapter(activity, MusicManager.tracks) { t ->
+                        TrackEditDialog.show(activity, t) { loadTracks() }
+                    }
+                }
+                refreshUi()
+            }
+        }
         refreshUi()
     }
 

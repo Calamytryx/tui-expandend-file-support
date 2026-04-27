@@ -13,6 +13,7 @@ import com.rama.tui.managers.MusicManager
 class TrackAdapter(
     private val context: Context,
     private val allTracks: List<Track>,
+    private val onLongClick: ((Track) -> Unit)? = null,
 ) : BaseAdapter() {
 
     private var tracks: List<Track> = allTracks
@@ -65,6 +66,11 @@ class TrackAdapter(
             val filteredList = filtered.toList()
             MusicManager.setTracks(filteredList, filtered.indexOf(track))
             updateTracks(filteredList) // base list is now the filtered list
+        }
+
+        view.setOnLongClickListener {
+            onLongClick?.invoke(track)
+            true
         }
 
         return view

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:padding="16sp"
     android:orientation="vertical"
     android:background="@color/bg_1"
@@ -14,7 +14,7 @@
         android:layout_marginBottom="16sp"
         android:textSize="32sp"
         android:textColor="@color/foreground"
-        android:text="Edit song"
+        android:text="Edit track"
         android:gravity="center" />
 
     <ScrollView
@@ -74,7 +74,7 @@
                 android:layout_marginBottom="8sp"
                 android:textSize="16sp"
                 android:textColor="@color/foreground"
-                android:text="Countries (Comma Separated)" />
+                android:text="Countries :: ISO 3166-1 Alpha-2 (Comma Separated)" />
 
             <EditText
                 android:id="@+id/country"
@@ -93,7 +93,7 @@
                 android:layout_marginBottom="8sp"
                 android:textSize="16sp"
                 android:textColor="@color/foreground"
-                android:text="Languages (Comma Separated)" />
+                android:text="Languages :: ISO 639 (Comma Separated)" />
 
             <EditText
                 android:id="@+id/language"
