@@ -83,11 +83,11 @@
                     android:icon="@drawable/icon_octagon_check_solid"
                     android:text="@string/icon_ads_desc" />
 
-                <com.rama.tui.widgets.WdLabel
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:icon="@drawable/icon_octagon_check_solid"
-                    android:text="@string/icon_block_desc" />
+                <!--                <com.rama.tui.widgets.WdLabel-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:icon="@drawable/icon_octagon_check_solid"-->
+                <!--                    android:text="@string/icon_block_desc" />-->
 
                 <com.rama.tui.widgets.WdLabel
                     android:layout_width="match_parent"
