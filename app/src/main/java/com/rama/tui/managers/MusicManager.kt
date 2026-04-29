@@ -107,8 +107,6 @@ object MusicManager {
         )
     }
 
-    // endregion
-
     // region Audio Focus
 
     fun requestAudioFocus(context: Context) {
@@ -144,8 +142,6 @@ object MusicManager {
         }
     }
 
-    // endregion
-
     // region Permissions
 
     fun hasPermission(context: Context?): Boolean {
@@ -163,45 +159,57 @@ object MusicManager {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    // endregion
-
     // region Track Loading
 
     fun loadTracks(context: Context): Boolean {
         if (!hasPermission(context)) return false
-        val dirs = getStorageVolumes(context)
+        val dirs = getStorageRoots(context)
         allTracks = dirs.flatMap { scanDir(it) }.sortedBy { it.title.lowercase() }
         tracks = allTracks
         if (tracks.isNotEmpty() && currentIndex < 0) currentIndex = 0
         return true
     }
 
-    private fun getStorageVolumes(context: Context): List<File> {
-        val volumes = mutableListOf<File>()
+    private fun getStorageRoots(context: Context): List<File> {
+        val roots = mutableListOf<File>()
 
-        volumes.add(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC))
+        // Internal storage root
+        val internalRoot = Environment.getExternalStorageDirectory()
+        if (internalRoot.exists()) roots.add(internalRoot)
 
-        context.getExternalFilesDirs(Environment.DIRECTORY_MUSIC)
+        // SD card and any other mounted volumes. walk up from the app-specific dir to the volume root
+        context.getExternalFilesDirs(null)
             .filterNotNull()
             .forEach { appSpecificDir ->
-                // Path: /storage/<id>/Android/data/<pkg>/files/Music — 5 levels up = volume root
+                // Path: /storage/<id>/Android/data/<pkg>/files. 4 levels up = volume root
                 val volumeRoot =
-                    appSpecificDir.parentFile?.parentFile?.parentFile?.parentFile?.parentFile
-                val musicDir = volumeRoot?.let { File(it, Environment.DIRECTORY_MUSIC) }
-                if (musicDir?.exists() == true) volumes.add(musicDir)
+                    appSpecificDir.parentFile?.parentFile?.parentFile?.parentFile
+                if (volumeRoot != null && volumeRoot.exists() && volumeRoot !in roots)
+                    roots.add(volumeRoot)
             }
 
-        return volumes.distinct().filter { it.exists() && it.isDirectory }
+        return roots.distinct().filter { it.exists() && it.isDirectory }
     }
 
-    private fun scanDir(dir: File): List<Track> =
-        dir.listFiles()
-            ?.filter { it.isFile && it.extension.lowercase() in Track.AUDIO_EXTENSIONS }
-            ?.map { Track.fromFile(it) }
-            ?.sortedBy { it.title.lowercase() }
-            ?: emptyList()
-
-    // endregion
+    private fun scanDir(dir: File): List<Track> {
+        val results = mutableListOf<Track>()
+        val stack = ArrayDeque<File>()
+        stack.addLast(dir)
+        while (stack.isNotEmpty()) {
+            val current = stack.removeLast()
+            // Skip Android system directories to avoid permission errors and irrelevant content
+            if (current.name == "Android") continue
+            val children = current.listFiles() ?: continue
+            for (child in children) {
+                when {
+                    child.isDirectory -> stack.addLast(child)
+                    child.isFile && child.extension.lowercase() in Track.AUDIO_EXTENSIONS ->
+                        results.add(Track.fromFile(child))
+                }
+            }
+        }
+        return results
+    }
 
     // region Playback Control
 
@@ -270,8 +278,6 @@ object MusicManager {
         updatePlaybackState()
     }
 
-    // endregion
-
     // region Track Management
 
     fun setTracks(newTracks: List<Track>, index: Int = 0) {
@@ -296,8 +302,6 @@ object MusicManager {
         return p.currentPosition.toFloat() / p.duration
     }
 
-    // endregion
-
     // region Internal
 
     private fun onTrackFinished() {
@@ -306,6 +310,4 @@ object MusicManager {
             else -> next()
         }
     }
-
-    // endregion
 }
