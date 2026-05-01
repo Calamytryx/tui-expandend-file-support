@@ -21,9 +21,9 @@ https://www.youtube.com/watch?v=DPWnYDvfU2M
 
 ## Screenshots
 
-| Focus                                                                    | Stopwatch                                                                    | About                                                                     |
+| Playlist                                                                    | Settings                                                                    | About                                                                     |
 |--------------------------------------------------------------------------|------------------------------------------------------------------------------|---------------------------------------------------------------------------|
-| ![Home](./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png) | ![Settings](./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png) | ![About](./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png) |
+| ![Playlist](./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png) | ![Settings](./fastlane/metadata/android/en-US/images/phoneScreenshots/2.png) | ![About](./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png) |
 
 ---
 
