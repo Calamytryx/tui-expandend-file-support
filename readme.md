@@ -1,5 +1,11 @@
 ![Preview](./docs/img/tui_header_1200x630.svg)
 
+<p align="center">
+  <a href="https://github.com/rama-io/tui/releases/latest"><img src="https://img.shields.io/github/v/release/rama-io/tui?label=release&color=127c77" alt="Release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPLv3%20or%20Later-1d8f58" alt="License: GPLv3 or Later"></a>
+  <a href="https://github.com/rama-io/tui/releases"><img src="https://img.shields.io/github/downloads/rama-io/tui/total?color=blue" alt="Downloads"></a>
+</p>
+
 # Tui
 
 **Tui** is a minimal, privacy-first local music player that skips metadata entirely. What you see is exactly what you name, no hidden tags, no surprises.
@@ -42,8 +48,6 @@ https://www.youtube.com/watch?v=DPWnYDvfU2M
 ---
 
 ## License
-
-[![GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](https://spdx.org/licenses/GPL-3.0-or-later.html)
 
 **Tui** is Free Software. You are free to use, study, share, and improve it under the terms of the
 **GNU General Public License v3** or later.
