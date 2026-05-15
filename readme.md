@@ -21,7 +21,7 @@ Want to see how Tui’s visual identity came together?
 
 This short session captures part of the process behind designing the app’s header. Exploring sketches, composition, and refinement as the direction takes shape.
 
-https://www.youtube.com/watch?v=DPWnYDvfU2M
+https://www.youtube.com/watch?v=We8xXVLiVI4
 
 ---
 
