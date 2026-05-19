@@ -1,24 +1,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/app_row_header"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingStart="16sp"
-    android:paddingEnd="16sp"
-    android:background="@color/bg_2"
-    android:gravity="center">
+    style="@style/HorizontalListDivided_BG2">
 
     <FrameLayout
         android:id="@+id/disc"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16sp">
+        android:layout_height="wrap_content">
 
         <ImageView
-            android:layout_width="32sp"
-            android:layout_height="32sp"
-            android:layout_gravity="center"
-            android:src="@drawable/icon_disc" />
+            android:src="@drawable/icon_disc"
+            style="@style/Icon32" />
     </FrameLayout>
 
     <LinearLayout

@@ -32,6 +32,11 @@
         <item name="android:divider">@drawable/list_divider</item>
     </style>
 
+    <style name="HorizontalListDivided_BG2" parent="HorizontalList_BG2">
+        <item name="android:showDividers">middle</item>
+        <item name="android:divider">@drawable/list_divider</item>
+    </style>
+
     <style name="VerticalList" parent="BlockFlow">
         <item name="android:orientation">vertical</item>
     </style>
@@ -146,6 +151,12 @@
         <item name="android:layout_height">24sp</item>
         <item name="android:layout_gravity">center</item>
         <!--        <item name="android:tint">@color/icon</item>-->
+    </style>
+
+    <style name="Icon32">
+        <item name="android:layout_width">32sp</item>
+        <item name="android:layout_height">32sp</item>
+        <item name="android:layout_gravity">center</item>
     </style>
 
     <style name="ColorPickerBtn" parent="BlockFlow">

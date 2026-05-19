@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     android:padding="16sp"
-    android:orientation="vertical"
     android:background="@color/bg_1"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    style="@style/VerticalListDivided">
 
     <TextView
         android:id="@+id/modal_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16sp"
-        android:textSize="32sp"
-        android:textColor="@color/foreground"
         android:text="Edit track"
-        android:gravity="center" />
+        style="@style/H2_center" />
 
     <ScrollView
         android:layout_weight="1"
@@ -23,158 +16,88 @@
         android:layout_height="0dp">
 
         <LinearLayout
-            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:padding="16sp"
-            android:orientation="vertical"
-            android:background="@color/bg_1"
-            android:focusableInTouchMode="true">
+            android:focusableInTouchMode="true"
+            style="@style/VerticalListDivided">
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8sp"
-                android:textSize="16sp"
-                android:textColor="@color/foreground"
-                android:text="Title" />
+                android:text="Title"
+                style="@style/Text" />
 
             <EditText
                 android:id="@+id/title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textSize="16sp"
-                android:padding="16sp"
-                android:layout_marginBottom="8sp"
-                android:background="@color/input" />
+                style="@style/EditText" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8sp"
-                android:textSize="16sp"
-                android:textColor="@color/foreground"
-                android:text="Artists (Comma Separated)" />
+                android:text="Artists (Comma Separated)"
+                style="@style/Text" />
 
             <MultiAutoCompleteTextView
                 android:id="@+id/artist"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:padding="16sp"
-                android:layout_marginBottom="8sp"
-                android:background="@color/input"
-                android:inputType="textCapWords" />
+                android:inputType="textCapWords"
+                style="@style/EditText" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8sp"
-                android:textSize="16sp"
-                android:textColor="@color/foreground"
-                android:text="Countries :: ISO 3166-1 Alpha-2 (Comma Separated)" />
+                android:text="Countries :: ISO 3166-1 Alpha-2 (Comma Separated)"
+                style="@style/Text" />
 
             <EditText
                 android:id="@+id/country"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textSize="16sp"
-                android:padding="16sp"
-                android:layout_marginBottom="8sp"
-                android:background="@color/input" />
+                android:background="@color/input"
+                style="@style/EditText" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8sp"
-                android:textSize="16sp"
-                android:textColor="@color/foreground"
-                android:text="Languages :: ISO 639 (Comma Separated)" />
+                android:text="Languages :: ISO 639 (Comma Separated)"
+                style="@style/Text" />
 
             <EditText
                 android:id="@+id/language"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textSize="16sp"
-                android:padding="16sp"
-                android:layout_marginBottom="8sp"
-                android:background="@color/input" />
+                style="@style/EditText" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8sp"
-                android:textSize="16sp"
-                android:textColor="@color/foreground"
-                android:text="Summary" />
+                android:text="Summary"
+                style="@style/Text" />
 
             <TextView
                 android:id="@+id/display"
                 android:background="@color/bg_display"
-                android:padding="16sp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8sp"
                 android:lineHeight="20sp"
-                android:textSize="16sp"
                 android:textColor="@color/accent_3"
-                android:text="Artist_1, Artist_2, .., Artist_N - Title - Country_1, Country_2, .., Country_N - Language_1, Language_2, .., Language_N" />
+                android:text="Artist_1, Artist_2, .., Artist_N - Title - Country_1, Country_2, .., Country_N - Language_1, Language_2, .., Language_N"
+                style="@style/Text" />
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8sp"
-                android:textSize="16sp"
-                android:textColor="@color/foreground"
-                android:text="Metadata" />
+                android:text="Metadata"
+                style="@style/Text" />
 
             <TextView
                 android:id="@+id/display_metadata"
                 android:background="@color/bg_display"
-                android:padding="16sp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8sp"
                 android:lineHeight="20sp"
-                android:textSize="16sp"
                 android:textColor="@color/danger"
-                android:text="Artist, Title, Album, Year, Covert, Description" />
+                android:text="Artist, Title, Album, Year, Covert, Description"
+                style="@style/Text" />
         </LinearLayout>
     </ScrollView>
 
     <Button
         android:id="@+id/delete_metadata_button"
-        android:layout_width="match_parent"
-        android:layout_marginBottom="8sp"
-        android:layout_height="wrap_content"
-        android:background="@color/danger"
-        android:text="Delete metadata" />
+        android:text="Delete metadata"
+        style="@style/BTN_danger" />
 
     <Button
         android:id="@+id/delete_button"
-        android:layout_width="match_parent"
-        android:layout_marginBottom="8sp"
-        android:layout_height="wrap_content"
-        android:background="@color/danger"
-        android:text="Delete track" />
+        android:text="Delete track"
+        style="@style/BTN_danger" />
 
     <Button
         android:id="@+id/update_button"
-        android:layout_width="match_parent"
-        android:layout_marginBottom="8sp"
-        android:layout_height="wrap_content"
-        android:background="@color/button_2"
-        android:text="Update track" />
+        android:text="Update track"
+        style="@style/BTN2" />
 
     <Button
         android:id="@+id/cancel_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/button_1"
-        android:text="@string/btn_go_back" />
+        android:text="@string/btn_go_back"
+        style="@style/BTN1" />
 </LinearLayout>
