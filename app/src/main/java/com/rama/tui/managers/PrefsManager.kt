@@ -41,6 +41,7 @@ class PrefsManager private constructor(context: Context) {
         const val APP_THEME_ACCENT_1 = "app:theme:accent_1"
         const val APP_THEME_ACCENT_2 = "app:theme:accent_2"
         const val APP_THEME_ACCENT_3 = "app:theme:accent_3"
+        const val APP_THEME_ACCENT_4 = "app:theme:accent_4"
         const val APP_THEME_DISABLED = "app:theme:disabled"
         const val APP_THEME_PROGRESS_BAR = "app:theme:progress"
         const val APP_THEME_INPUT = "app:theme:input"

@@ -12,7 +12,7 @@
 
         <ImageView
             android:src="@drawable/icon_disc"
-                android:tint="@color/accent_1"
+            android:tint="@color/accent_4"
             style="@style/Icon32" />
     </FrameLayout>
 

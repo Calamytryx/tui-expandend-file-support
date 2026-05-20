@@ -23,6 +23,7 @@ object ThemeManager {
         val accent_1: Int,
         val accent_2: Int,
         val accent_3: Int,
+        val accent_4: Int,
         val disabled: Int,
         val input: Int,
         val button_1: Int,
@@ -46,6 +47,7 @@ object ThemeManager {
         accent_1 = 0xFFABD68E.toInt(),
         accent_2 = 0xFFCDC58B.toInt(),
         accent_3 = 0xFFDCD07C.toInt(),
+        accent_4 = 0xFF7CB1DC.toInt(),
         disabled = 0xFF888888.toInt(),
         input = 0xFF16161F.toInt(),
         button_1 = 0xFF459984.toInt(),
@@ -53,7 +55,7 @@ object ThemeManager {
         button_2 = 0xFF6194AF.toInt(),
         danger = 0xFFDC6364.toInt(),
         collapsible_header = 0xFF878787.toInt(),
-        progressbar = 0xFF4c8555.toInt(),
+        progressbar = 0xFF3D4E36.toInt(),
     )
 
     // Rama
@@ -69,13 +71,14 @@ object ThemeManager {
         accent_1 = 0xFFABD68E.toInt(),
         accent_2 = 0xFFCDC58B.toInt(),
         accent_3 = 0xFFDCD07C.toInt(),
+        accent_4 = 0xFF6D9978.toInt(),
         disabled = 0xFF888888.toInt(),
         input = 0xFF161f16.toInt(),
         button_1 = 0xFFABD68E.toInt(),
         button_1_selected = 0xFFC4E7AD.toInt(),
         button_2 = 0xFFb8e39d.toInt(),
         danger = 0xFFDC6364.toInt(),
-        collapsible_header = 0xff8cde285.toInt(),
+        collapsible_header = 0xFF8DE285.toInt(),
         progressbar = 0xFF4F6B45.toInt(),
     )
 
@@ -92,6 +95,7 @@ object ThemeManager {
         accent_1 = 0xFFA6E3A1.toInt(),
         accent_2 = 0xFFF9E2AF.toInt(),
         accent_3 = 0xFFFFD700.toInt(),
+        accent_4 = 0xFF89B4FA.toInt(),
         disabled = 0xFF6C7086.toInt(),
         input = 0xFF181825.toInt(),
         button_1 = 0xFFCBA6F7.toInt(),
@@ -116,6 +120,7 @@ object ThemeManager {
         accent_1 = 0xFF50FA7B.toInt(),
         accent_2 = 0xFFF1FA8C.toInt(),
         accent_3 = 0xFFFFB86C.toInt(),
+        accent_4 = 0xFF8BE9FD.toInt(),
         disabled = 0xFF6272A4.toInt(),
         input = 0xFF21222C.toInt(),
         button_1 = 0xFFBD93F9.toInt(),
@@ -126,7 +131,7 @@ object ThemeManager {
         progressbar = 0xFF5A4A75.toInt(),
     )
 
-    // Melange Dark
+    // Mélange Dark
     private val MELANGE = Palette(
         h1 = 0xFFEBC06D.toInt(),
         foreground = 0xFFECE1D7.toInt(),
@@ -139,6 +144,7 @@ object ThemeManager {
         accent_1 = 0xFF78997A.toInt(),
         accent_2 = 0xFFEBC06D.toInt(),
         accent_3 = 0xFFE49B5D.toInt(),
+        accent_4 = 0xFF8CBBA3.toInt(),
         disabled = 0xFF867462.toInt(),
         input = 0xFF211E1B.toInt(),
         button_1 = 0xFFEBC06D.toInt(),
@@ -162,6 +168,7 @@ object ThemeManager {
         accent_1 = 0xFF9ECE6A.toInt(),
         accent_2 = 0xFFE0AF68.toInt(),
         accent_3 = 0xFFFF9E64.toInt(),
+        accent_4 = 0xFF2AC3DE.toInt(),
         disabled = 0xFF565F89.toInt(),
         input = 0xFF16161E.toInt(),
         button_1 = 0xFF7AA2F7.toInt(),
@@ -202,6 +209,7 @@ object ThemeManager {
             accent_1 = get(PrefsManager.PrefKeys.APP_THEME_ACCENT_1, base.accent_1),
             accent_2 = get(PrefsManager.PrefKeys.APP_THEME_ACCENT_2, base.accent_2),
             accent_3 = get(PrefsManager.PrefKeys.APP_THEME_ACCENT_3, base.accent_3),
+            accent_4 = get(PrefsManager.PrefKeys.APP_THEME_ACCENT_4, base.accent_4),
             disabled = get(PrefsManager.PrefKeys.APP_THEME_DISABLED, base.disabled),
             input = get(PrefsManager.PrefKeys.APP_THEME_INPUT, base.input),
             button_1 = get(PrefsManager.PrefKeys.APP_THEME_BUTTON_1, base.button_1),
@@ -246,19 +254,19 @@ object ThemeManager {
         palette: Palette,
         typeface: android.graphics.Typeface?
     ) {
-        // Icon tinting — ImageView src drawables use @color/* fill colors which don't
+        // Icon tinting, ImageView src drawables use @color/* fill colors which don't
         // update automatically when the palette changes. We apply an imageTintList so
         // the color is remapped through the same mapColor logic used everywhere else.
         if (view is ImageView) {
             val currentTint = view.imageTintList?.defaultColor
             if (currentTint != null) {
-                // Already has a tint — remap it to the new palette slot
+                // Already has a tint, remap it to the new palette slot
                 val mapped = mapColor(context, currentTint, palette)
                 if (mapped != null) {
                     view.imageTintList = android.content.res.ColorStateList.valueOf(mapped)
                 }
             } else {
-                // No tint set yet — seed from the drawable's fill color resource so
+                // No tint set yet, seed from the drawable's fill color resource so
                 // subsequent theme switches can remap it correctly.
                 val seedColor = resolveDrawableFillColor(context, view) ?: return
                 val mapped = mapColor(context, seedColor, palette) ?: seedColor
@@ -286,7 +294,7 @@ object ThemeManager {
                 }
 
                 else -> {
-                    // Only remap if we recognise the color — don't blindly overwrite
+                    // Only remap if we recognise the color, don't blindly overwrite
                     // with foreground, as that would clobber clock/icon/header text colors
                     val mapped = mapColor(context, view.currentTextColor, palette)
                     if (mapped != null) view.setTextColor(mapped)
@@ -385,6 +393,11 @@ object ThemeManager {
             DRACULA.accent_3, MELANGE.accent_3, TOKYO_NIGHT.accent_3, custom.accent_3,
             context.resources.getColor(R.color.accent_3) -> palette.accent_3
 
+            // accent_4
+            MAKO.accent_4, RAMA.accent_4, CATPPUCCIN_MOCHA.accent_4,
+            DRACULA.accent_4, MELANGE.accent_4, TOKYO_NIGHT.accent_4, custom.accent_4,
+            context.resources.getColor(R.color.accent_4) -> palette.accent_4
+
             // collapsible_header
             MAKO.collapsible_header, RAMA.collapsible_header, CATPPUCCIN_MOCHA.collapsible_header,
             DRACULA.collapsible_header, MELANGE.collapsible_header, TOKYO_NIGHT.collapsible_header, custom.collapsible_header,
@@ -418,7 +431,7 @@ object ThemeManager {
      * Returns null if no tint has been set (icon will be skipped this pass).
      */
     private fun resolveDrawableFillColor(context: Context, view: ImageView): Int? {
-        // android:tint in XML is exposed as imageTintList — but we already handle
+        // android:tint in XML is exposed as imageTintList, but we already handle
         // the tintList != null case before calling this. This path is only reached
         // when no tint is set at all, which shouldn't happen once the layouts are
         // updated. Return null so we skip safely rather than guess.

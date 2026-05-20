@@ -20,7 +20,7 @@
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:src="@drawable/tui_icon_outline"
-                android:tint="@color/accent_1"
+                android:tint="@color/accent_4"
                 android:layout_gravity="center" />
 
             <TextView

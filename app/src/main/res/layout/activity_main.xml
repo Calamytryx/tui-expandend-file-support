@@ -92,14 +92,12 @@
 
         <TextView
             android:id="@+id/currently_playing_text"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textColor="@color/accent_3"
-            android:gravity="center"
+            android:textColor="@color/accent_1"
+            android:layout_gravity="center"
             android:paddingStart="16sp"
             android:paddingEnd="16sp"
             android:text="@string/placeholder_now_playing"
-            android:textSize="16sp" />
+            style="@style/Text" />
     </FrameLayout>
 
     <LinearLayout
