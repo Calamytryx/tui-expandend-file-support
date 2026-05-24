@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.EditText
 import android.widget.MultiAutoCompleteTextView
 import android.widget.TextView
@@ -18,7 +19,7 @@ import com.rama.tui.R
 import com.rama.tui.Track
 import com.rama.tui.managers.FontManager
 import com.rama.tui.managers.MusicManager
-import com.rama.tui.widgets.WdButton
+import com.rama.tui.managers.ThemeManager
 import java.io.File
 
 object TrackEditDialog {
@@ -60,10 +61,10 @@ object TrackEditDialog {
         val summaryView = dialog.findViewById<TextView>(R.id.display)
         val metadataView = dialog.findViewById<TextView>(R.id.display_metadata)
 
-        val deleteMetaBtn = dialog.findViewById<WdButton>(R.id.delete_metadata_button)
-        val deleteSongBtn = dialog.findViewById<WdButton>(R.id.delete_button)
-        val updateBtn = dialog.findViewById<WdButton>(R.id.update_button)
-        val cancelBtn = dialog.findViewById<WdButton>(R.id.cancel_button)
+        val deleteMetaBtn = dialog.findViewById<Button>(R.id.delete_metadata_button)
+        val deleteSongBtn = dialog.findViewById<Button>(R.id.delete_button)
+        val updateBtn = dialog.findViewById<Button>(R.id.update_button)
+        val cancelBtn = dialog.findViewById<Button>(R.id.cancel_button)
 
         titleInput.setText(track.title)
         artistInput.setText(track.artists.joinToString(", "))
@@ -116,7 +117,7 @@ object TrackEditDialog {
             embeddedMeta.entries.joinToString("\n") { (k, v) -> "$k: $v" }
         }
 
-        FontManager.applyToView(activity, dialog.findViewById(android.R.id.content))
+        ThemeManager.applyTheme(activity, dialog.findViewById(android.R.id.content))
 
         // Strip metadata
         deleteMetaBtn.setOnClickListener {
