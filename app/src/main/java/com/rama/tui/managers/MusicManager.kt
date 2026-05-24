@@ -53,6 +53,7 @@ object MusicManager {
     // region Media Session
 
     fun initMediaSession(context: Context) {
+        if (mediaSession != null) return
         appContext = context.applicationContext
 
         val receiver = ComponentName(context, MediaButtonReceiver::class.java)
@@ -117,7 +118,11 @@ object MusicManager {
 
     // region Audio Focus
 
+    private var audioFocusRequested = false
+
     fun requestAudioFocus(context: Context) {
+        if (audioFocusRequested) return
+        audioFocusRequested = true
         val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
         // Required on older Android for Bluetooth headset button routing
