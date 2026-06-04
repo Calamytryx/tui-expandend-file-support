@@ -66,6 +66,7 @@
     <string name="label_track_languages">Languages :: ISO 639 (Comma Separated)</string>
     <string name="label_track_summary">Summary</string>
     <string name="label_track_metadata">Metadata</string>
+    <string name="label_zoom">Zoom</string>
 
     <!-- InputHints -->
     <string name="hint_filter_tracks">Search…</string>
