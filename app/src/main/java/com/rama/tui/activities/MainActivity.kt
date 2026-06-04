@@ -90,7 +90,10 @@ class MainActivity : CsActivity() {
             refreshUi()
         }
         shuffleButton.setOnClickListener {
-            MusicManager.shuffleTracks()
+            val keepTogether = prefs.getBoolean(
+                com.rama.tui.managers.PrefsManager.PrefKeys.LIST_SORT_KEEP_TOGETHER, false
+            )
+            MusicManager.shuffleTracks(keepTogether)
             (listView.adapter as? TrackAdapter)?.updateTracks(MusicManager.tracks)
             listView.smoothScrollToPosition(0)
         }

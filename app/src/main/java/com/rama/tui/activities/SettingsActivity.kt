@@ -11,6 +11,7 @@ import com.rama.tui.activities.settings.SettingsAppearanceController
 import com.rama.tui.activities.settings.SettingsBasicController
 import com.rama.tui.activities.settings.SettingsCheckboxController
 import com.rama.tui.activities.settings.SettingsLanguageController
+import com.rama.tui.activities.settings.SettingsListController
 import com.rama.tui.managers.PrefsManager
 
 class SettingsActivity : CsActivity() {
@@ -30,6 +31,7 @@ class SettingsActivity : CsActivity() {
         appearanceController = SettingsAppearanceController(this).also { it.setup() }
         SettingsLanguageController(this).setup()
         SettingsCheckboxController(this).setup()
+        SettingsListController(this).setup()
     }
 
     override fun onResume() {

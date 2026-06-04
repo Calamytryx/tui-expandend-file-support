@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import com.rama.tui.MediaButtonReceiver
 import com.rama.tui.MediaPlaybackService
 import com.rama.tui.Track
+import com.rama.tui.managers.PrefsManager
 import java.io.File
 
 object MusicManager {
@@ -192,11 +193,44 @@ object MusicManager {
 
     fun loadTracks(context: Context): Boolean {
         if (!hasPermission(context)) return false
+        val prefs = PrefsManager.getInstance(context)
+        val sortStyle = prefs.getString(PrefsManager.PrefKeys.LIST_SORT_STYLE, PrefsManager.SortStyle.AZ)
+        val keepTogether = prefs.getBoolean(PrefsManager.PrefKeys.LIST_SORT_KEEP_TOGETHER, false)
+
         val dirs = getStorageRoots(context)
-        allTracks = dirs.flatMap { scanDir(it) }.sortedBy { it.title.lowercase() }
+        val raw = dirs.flatMap { scanDir(it) }
+
+        allTracks = sortTracks(raw, sortStyle, keepTogether)
         tracks = allTracks
         if (tracks.isNotEmpty() && currentIndex < 0) currentIndex = 0
         return true
+    }
+
+    /** Sort tracks by title (az/za), optionally grouping files from the same folder together. */
+    fun sortTracks(
+        source: List<Track>,
+        sortStyle: String,
+        keepTogether: Boolean
+    ): List<Track> {
+        val comparator: Comparator<Track> = when (sortStyle) {
+            PrefsManager.SortStyle.ZA -> compareByDescending { it.title.lowercase() }
+            else -> compareBy { it.title.lowercase() }
+        }
+
+        return if (keepTogether) {
+            // Group by parent folder, sort folder names, then sort within each folder
+            val folderComparator: Comparator<String> = when (sortStyle) {
+                PrefsManager.SortStyle.ZA -> compareByDescending { it.lowercase() }
+                else -> compareBy { it.lowercase() }
+            }
+            source
+                .groupBy { it.file.parent ?: "" }
+                .entries
+                .sortedWith(Comparator { a, b -> folderComparator.compare(a.key, b.key) })
+                .flatMap { (_, folderTracks) -> folderTracks.sortedWith(comparator) }
+        } else {
+            source.sortedWith(comparator)
+        }
     }
 
     private fun getStorageRoots(context: Context): List<File> {
@@ -321,14 +355,31 @@ object MusicManager {
         onStateChanged?.invoke()
     }
 
-    fun shuffleTracks() {
+    fun shuffleTracks(keepTogether: Boolean = false) {
         if (tracks.isEmpty()) return
         val current = currentTrack
-        val rest = tracks.toMutableList().also {
-            if (current != null) it.remove(current)
-        }.shuffled()
-        tracks = if (current != null) listOf(current) + rest else rest
-        currentIndex = 0
+
+        tracks = if (keepTogether) {
+            // Shuffle whole folder groups, keep tracks within each folder in their current order
+            val groups = tracks.groupBy { it.file.parent ?: "" }.values.toMutableList().shuffled()
+            val shuffled = groups.flatten().toMutableList()
+            // Keep current track (and its folder block) at the front
+            if (current != null) {
+                val currentFolder = current.file.parent ?: ""
+                val currentGroup = shuffled.filter { it.file.parent == currentFolder }
+                val rest = shuffled.filter { it.file.parent != currentFolder }
+                currentGroup + rest
+            } else {
+                shuffled
+            }
+        } else {
+            val rest = tracks.toMutableList().also {
+                if (current != null) it.remove(current)
+            }.shuffled()
+            if (current != null) listOf(current) + rest else rest
+        }
+
+        currentIndex = if (current != null) tracks.indexOf(current).coerceAtLeast(0) else 0
         onStateChanged?.invoke()
     }
 

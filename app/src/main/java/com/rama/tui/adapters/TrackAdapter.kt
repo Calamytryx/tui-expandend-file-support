@@ -11,7 +11,6 @@ import com.rama.tui.Track.Companion.normalize
 import com.rama.tui.managers.FontManager
 import com.rama.tui.managers.MusicManager
 import com.rama.tui.managers.ThemeManager
-import java.text.Normalizer
 
 class TrackAdapter(
     private val context: Context,
@@ -19,71 +18,114 @@ class TrackAdapter(
     private val onLongClick: ((Track) -> Unit)? = null,
 ) : BaseAdapter() {
 
-    private var tracks: List<Track> = allTracks
-    private var filtered: List<Track> = allTracks
+    // A list item is either a Track or a String folder header
+    sealed class Item {
+        data class Header(val folderName: String) : Item()
+        data class TrackItem(val track: Track) : Item()
+    }
+
+    private var items: List<Item> = buildItems(allTracks)
+    private var filteredItems: List<Item> = items
+
+    // The flat track list (headers excluded) for playback use
+    val flatTracks: List<Track>
+        get() = filteredItems.filterIsInstance<Item.TrackItem>().map { it.track }
+
+    private fun buildItems(tracks: List<Track>): List<Item> {
+        val result = mutableListOf<Item>()
+        var lastFolder: String? = null
+        for (track in tracks) {
+            val folder = track.file.parentFile?.name ?: track.file.parent ?: ""
+            if (folder != lastFolder) {
+                result.add(Item.Header(folder))
+                lastFolder = folder
+            }
+            result.add(Item.TrackItem(track))
+        }
+        return result
+    }
 
     fun updateTracks(newTracks: List<Track>) {
-        tracks = newTracks
-        filtered = newTracks
+        items = buildItems(newTracks)
+        filteredItems = items
         notifyDataSetChanged()
     }
 
     fun resetToFullLibrary() {
-        tracks = allTracks
-        filtered = allTracks
+        items = buildItems(allTracks)
+        filteredItems = items
         notifyDataSetChanged()
     }
 
     fun filter(query: String) {
         val normalizedQuery = normalize(query)
+        val baseTracks = items.filterIsInstance<Item.TrackItem>().map { it.track }
 
-        filtered = if (normalizedQuery.isBlank()) {
-            tracks
+        val filtered = if (normalizedQuery.isBlank()) {
+            baseTracks
         } else {
-            tracks.filter {
-                it.normalizedName.contains(normalizedQuery)
-            }
+            baseTracks.filter { it.normalizedName.contains(normalizedQuery) }
         }
 
+        filteredItems = buildItems(filtered)
         notifyDataSetChanged()
     }
 
-    override fun getCount(): Int = filtered.size
-    override fun getItem(position: Int): Track = filtered[position]
+    override fun getCount(): Int = filteredItems.size
+    override fun getItem(position: Int): Any = filteredItems[position]
     override fun getItemId(position: Int): Long = position.toLong()
 
+    override fun getViewTypeCount(): Int = 2
+    override fun getItemViewType(position: Int): Int = when (filteredItems[position]) {
+        is Item.Header -> 0
+        is Item.TrackItem -> 1
+    }
+
+    override fun isEnabled(position: Int): Boolean = filteredItems[position] is Item.TrackItem
+
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view = convertView
-            ?: LayoutInflater.from(context).inflate(R.layout.list_track, parent, false)
+        return when (val item = filteredItems[position]) {
+            is Item.Header -> {
+                val view = convertView
+                    ?: LayoutInflater.from(context).inflate(R.layout.list_header, parent, false)
+                view.findViewById<TextView>(R.id.title).text = item.folderName
+                ThemeManager.applyTheme(context, view)
+                view
+            }
 
-        val track = filtered[position]
+            is Item.TrackItem -> {
+                val track = item.track
+                val view = convertView
+                    ?: LayoutInflater.from(context).inflate(R.layout.list_track, parent, false)
 
-        view.findViewById<TextView>(R.id.track_title).text = track.title
-        view.findViewById<TextView>(R.id.track_artist).text =
-            track.displayArtists.ifEmpty { "---" }
-        view.findViewById<TextView>(R.id.track_country).text =
-            track.displayCountries.ifEmpty { "---" }
-        view.findViewById<TextView>(R.id.track_lang).text =
-            track.displayLanguages.ifEmpty { "---" }
-        view.findViewById<TextView>(R.id.track_ext).text = track.ext
+                view.findViewById<TextView>(R.id.track_title).text = track.title
+                view.findViewById<TextView>(R.id.track_artist).text =
+                    track.displayArtists.ifEmpty { "---" }
+                view.findViewById<TextView>(R.id.track_country).text =
+                    track.displayCountries.ifEmpty { "---" }
+                view.findViewById<TextView>(R.id.track_lang).text =
+                    track.displayLanguages.ifEmpty { "---" }
+                view.findViewById<TextView>(R.id.track_ext).text = track.ext
 
-        // Highlight currently playing row
-        val isActive = tracks.indexOf(track) == MusicManager.currentIndex
-        view.findViewById<FrameLayout>(R.id.disc).alpha = if (isActive) 1f else 0.3f
+                // Highlight currently playing row
+                val isActive = MusicManager.tracks.indexOf(track) == MusicManager.currentIndex
+                view.findViewById<FrameLayout>(R.id.disc).alpha = if (isActive) 1f else 0.3f
 
-        ThemeManager.applyTheme(context, view)
+                ThemeManager.applyTheme(context, view)
 
-        view.setOnClickListener {
-            val filteredList = filtered.toList()
-            MusicManager.setTracks(filteredList, filtered.indexOf(track))
-            updateTracks(filteredList) // base list is now the filtered list
+                view.setOnClickListener {
+                    val playableTracks = flatTracks
+                    MusicManager.setTracks(playableTracks, playableTracks.indexOf(track))
+                    updateTracks(playableTracks)
+                }
+
+                view.setOnLongClickListener {
+                    onLongClick?.invoke(track)
+                    true
+                }
+
+                view
+            }
         }
-
-        view.setOnLongClickListener {
-            onLongClick?.invoke(track)
-            true
-        }
-
-        return view
     }
 }
