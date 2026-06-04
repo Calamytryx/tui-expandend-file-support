@@ -47,6 +47,7 @@ class MainActivity : CsActivity() {
     companion object {
         private const val REQ_AUDIO = 1001
         private const val REQ_MANAGE = 1002
+        private const val REQ_SETTINGS = 1003
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,9 +61,9 @@ class MainActivity : CsActivity() {
         applyCurrentTheme(root)
 
         val openSettingsBtn = findViewById<FrameLayout>(R.id.open_settings)
+
         openSettingsBtn.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-            true
+            startActivityForResult(Intent(this, SettingsActivity::class.java), REQ_SETTINGS)
         }
 
         // Bind views
@@ -90,7 +91,10 @@ class MainActivity : CsActivity() {
             refreshUi()
         }
         shuffleButton.setOnClickListener {
-            MusicManager.shuffleTracks()
+            val keepTogether = prefs.getBoolean(
+                com.rama.tui.managers.PrefsManager.PrefKeys.LIST_SORT_KEEP_TOGETHER, false
+            )
+            MusicManager.shuffleTracks(keepTogether)
             (listView.adapter as? TrackAdapter)?.updateTracks(MusicManager.tracks)
             listView.smoothScrollToPosition(0)
         }
@@ -182,6 +186,10 @@ class MainActivity : CsActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQ_MANAGE) {
             loadTracks()
+        }
+        if (requestCode == REQ_SETTINGS && resultCode == RESULT_OK) {
+            (listView.adapter as? TrackAdapter)?.updateTracks(MusicManager.tracks)
+            refreshUi()
         }
         TrackEditDialog.onActivityResult(this, requestCode, resultCode)
     }

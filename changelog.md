@@ -1,5 +1,11 @@
 # Changelog
 
+## 3
+
+- Add zoom
+- Add theme: catppuccin latte
+- Add custom sort
+
 ## 2
 
 - Add themes

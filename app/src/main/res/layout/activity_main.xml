@@ -37,7 +37,6 @@
             android:layout_weight="1"
             android:textSize="16sp"
             android:textColor="@color/foreground"
-            android:hint="@string/hint_filter_tracks"
             android:background="@android:color/transparent" />
 
         <FrameLayout

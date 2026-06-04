@@ -2,6 +2,7 @@ package com.rama.tui
 
 import android.app.Activity
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -12,15 +13,30 @@ import com.rama.tui.managers.ThemeManager
 import com.rama.tui.utils.dp
 import com.rama.tui.managers.PrefsManager
 import com.rama.tui.utils.LocaleHelper
+import kotlin.text.toInt
+import kotlin.times
 
 abstract class CsActivity : Activity() {
 
     val prefs by lazy { PrefsManager.getInstance(this) }
     private var lastKnownAppLanguage: String? = null
     private var lastKnownTheme: String? = null
+    private var lastKnownUiScale: Float = -1f
 
     override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(LocaleHelper.wrapContext(newBase))
+        val localeContext = LocaleHelper.wrapContext(newBase)
+
+        val scale = PrefsManager.getInstance(localeContext).getUiScale()
+
+        val context = if (scale != 1f) {
+            val config = Configuration(localeContext.resources.configuration)
+            config.densityDpi = (localeContext.resources.displayMetrics.densityDpi * scale).toInt()
+            localeContext.createConfigurationContext(config)
+        } else {
+            localeContext
+        }
+
+        super.attachBaseContext(context)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,6 +44,7 @@ abstract class CsActivity : Activity() {
         prefs.initPrefs()
         lastKnownAppLanguage = prefs.getAppLanguage()
         lastKnownTheme = prefs.getTheme()
+        lastKnownUiScale = prefs.getUiScale()
 
         // Allow drawing behind system bars
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -60,6 +77,13 @@ abstract class CsActivity : Activity() {
         val currentTheme = prefs.getTheme()
         if (currentTheme != lastKnownTheme) {
             lastKnownTheme = currentTheme
+            recreate()
+            return
+        }
+
+        val currentUiScale = prefs.getUiScale()
+        if (currentUiScale != lastKnownUiScale) {
+            lastKnownUiScale = currentUiScale
             recreate()
             return
         }

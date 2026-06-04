@@ -29,6 +29,9 @@ class PrefsManager private constructor(context: Context) {
         const val SYSTEM_BAR_VISIBLE = "system:bar:visible"
         const val SYSTEM_PREVENT_SLEEP = "system:prevent_sleeping"
 
+        const val LIST_SORT_STYLE = "list:sort:style"
+        const val LIST_SORT_KEEP_TOGETHER = "list:sort:keep_together"
+
         const val APP_THEME_NAME = "app:theme:name"
         const val APP_THEME_H1 = "app:theme:h1"
         const val APP_THEME_FOREGROUND = "app:theme:foreground"
@@ -55,12 +58,20 @@ class PrefsManager private constructor(context: Context) {
         const val SETTINGS_SECTION_SYSTEM = "settings:section:system"
         const val SETTINGS_SECTION_LANGUAGE = "settings:section:language"
         const val SETTINGS_SECTION_THEMES = "settings:section:themes"
+        const val SETTINGS_SECTION_LIST = "settings:section:list"
+
+        const val APP_UI_SCALE = "app:ui_scale"
     }
 
     object FontStyle {
         const val DEFAULT = "default"
         const val JERSEY_25 = "jersey-25"
         const val CUSTOM = "custom"
+    }
+
+    object SortStyle {
+        const val AZ = "az"
+        const val ZA = "za"
     }
 
     object Language {
@@ -72,6 +83,7 @@ class PrefsManager private constructor(context: Context) {
         const val RAMA = "rama"
         const val MAKO = "mako"
         const val CATPPUCCIN_MOCHA = "catppuccin_mocha"
+        const val CATPPUCCIN_LATTE = "catppuccin_latte"
         const val DRACULA = "dracula"
         const val MELANGE = "melange"
         const val TOKYO_NIGHT = "tokyo_night"
@@ -87,11 +99,16 @@ class PrefsManager private constructor(context: Context) {
                 .putBoolean(PrefKeys.SYSTEM_BAR_VISIBLE, false)
 
                 .putString(PrefKeys.APP_THEME_NAME, Theme.TOKYO_NIGHT)
+                .putString(PrefKeys.LIST_SORT_STYLE, SortStyle.AZ)
+                .putBoolean(PrefKeys.LIST_SORT_KEEP_TOGETHER, false)
+
+                .putFloat(PrefKeys.APP_UI_SCALE, 1f)
 
                 .putBoolean(PrefKeys.SETTINGS_SECTION_FONTS, true)
                 .putBoolean(PrefKeys.SETTINGS_SECTION_SYSTEM, true)
                 .putBoolean(PrefKeys.SETTINGS_SECTION_LANGUAGE, true)
                 .putBoolean(PrefKeys.SETTINGS_SECTION_THEMES, true)
+                .putBoolean(PrefKeys.SETTINGS_SECTION_LIST, true)
 
                 .apply()
         }
@@ -134,6 +151,12 @@ class PrefsManager private constructor(context: Context) {
         prefs.edit().putString(PrefKeys.APP_LANGUAGE, language).apply()
     }
 
+    fun getUiScale(): Float =
+        prefs.getFloat(PrefKeys.APP_UI_SCALE, 1f)
+
+    fun setUiScale(scale: Float) =
+        prefs.edit().putFloat(PrefKeys.APP_UI_SCALE, scale)
+            .apply()
 
     // GENERIC HELPERS
 

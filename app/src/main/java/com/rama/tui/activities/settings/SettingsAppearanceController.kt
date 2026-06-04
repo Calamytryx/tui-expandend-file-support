@@ -14,6 +14,8 @@ import com.rama.tui.managers.ThemeManager
 import java.io.File
 import java.io.FileOutputStream
 import com.rama.tui.widgets.WdColorPicker
+import com.rama.tui.widgets.WdRange
+import kotlin.compareTo
 
 class SettingsAppearanceController(private val activity: SettingsActivity) {
 
@@ -23,6 +25,7 @@ class SettingsAppearanceController(private val activity: SettingsActivity) {
         setupFontStyle()
         setupTheme()
         setupCustomTheme()
+        setupUiScale()
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -121,6 +124,7 @@ class SettingsAppearanceController(private val activity: SettingsActivity) {
             PrefsManager.Theme.RAMA -> group.check(R.id.theme_rama)
             PrefsManager.Theme.MAKO -> group.check(R.id.theme_mako)
             PrefsManager.Theme.CATPPUCCIN_MOCHA -> group.check(R.id.theme_catppuccin_mocha)
+            PrefsManager.Theme.CATPPUCCIN_LATTE -> group.check(R.id.theme_catppuccin_latte)
             PrefsManager.Theme.DRACULA -> group.check(R.id.theme_dracula)
             PrefsManager.Theme.MELANGE -> group.check(R.id.theme_melange)
             PrefsManager.Theme.TOKYO_NIGHT -> group.check(R.id.theme_tokyo_night)
@@ -133,6 +137,7 @@ class SettingsAppearanceController(private val activity: SettingsActivity) {
                 R.id.theme_rama -> PrefsManager.Theme.RAMA
                 R.id.theme_mako -> PrefsManager.Theme.MAKO
                 R.id.theme_catppuccin_mocha -> PrefsManager.Theme.CATPPUCCIN_MOCHA
+                R.id.theme_catppuccin_latte -> PrefsManager.Theme.CATPPUCCIN_LATTE
                 R.id.theme_dracula -> PrefsManager.Theme.DRACULA
                 R.id.theme_melange -> PrefsManager.Theme.MELANGE
                 R.id.theme_tokyo_night -> PrefsManager.Theme.TOKYO_NIGHT
@@ -222,6 +227,29 @@ class SettingsAppearanceController(private val activity: SettingsActivity) {
             prefs.setTheme(PrefsManager.Theme.CUSTOM)
             activity.recreate()
 
+        }
+    }
+
+    private fun setupUiScale() {
+        val range = activity.findViewById<WdRange>(R.id.zoom)
+
+        val savedScale = prefs.getUiScale()
+
+        range.onValueChanged = { value ->
+            val scale = value.toFloatOrNull() ?: 1f
+            if (scale != prefs.getUiScale()) {
+                prefs.setUiScale(scale)
+                activity.recreate()
+            }
+        }
+
+        val steps = activity.resources.getStringArray(R.array.ui_scale_steps).toList()
+        val matchIndex = steps.indexOfFirst { it.toFloatOrNull() == savedScale }
+        if (matchIndex >= 0) {
+            range.post {
+                val container = range.findViewById<android.widget.LinearLayout>(R.id.container)
+                (container?.getChildAt(matchIndex) as? android.widget.Button)?.performClick()
+            }
         }
     }
 }

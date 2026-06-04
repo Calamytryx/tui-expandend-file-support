@@ -11,6 +11,8 @@ import com.rama.tui.activities.settings.SettingsAppearanceController
 import com.rama.tui.activities.settings.SettingsBasicController
 import com.rama.tui.activities.settings.SettingsCheckboxController
 import com.rama.tui.activities.settings.SettingsLanguageController
+import com.rama.tui.activities.settings.SettingsListController
+import com.rama.tui.managers.MusicManager
 import com.rama.tui.managers.PrefsManager
 
 class SettingsActivity : CsActivity() {
@@ -30,6 +32,10 @@ class SettingsActivity : CsActivity() {
         appearanceController = SettingsAppearanceController(this).also { it.setup() }
         SettingsLanguageController(this).setup()
         SettingsCheckboxController(this).setup()
+        SettingsListController(this).setup {
+            MusicManager.reSort(this)
+            setResult(Activity.RESULT_OK)
+        }
     }
 
     override fun onResume() {
