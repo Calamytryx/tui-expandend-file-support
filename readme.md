@@ -1,18 +1,18 @@
 ![Preview](./docs/img/tui_header_1200x630.svg)
 ![Badge](https://rama-io.github.io/img/badge_tui.svg)
 
-# Tui
+# Tūī
 
-**Tui** is a minimal, privacy-first local music player that skips metadata entirely. What you see is exactly what you name, no hidden tags, no surprises.
+**Tūī** is a minimal, privacy-first local music player that skips metadata entirely. What you see is exactly what you name, no hidden tags, no surprises.
 
-Built entirely in **native Kotlin**, Tui runs fully **on-device**, avoids tracking, no internet
+Built entirely in **native Kotlin**, Tūī runs fully **on-device**, avoids tracking, no internet
 access, and no external APIs.
 
 ---
 
 ## Branding creation
 
-Want to see how Tui’s visual identity came together?
+Want to see how Tūī’s visual identity came together?
 
 This short session captures part of the process behind designing the app’s header. Exploring sketches, composition, and refinement as the direction takes shape.
 
@@ -44,7 +44,7 @@ https://www.youtube.com/watch?v=We8xXVLiVI4
 
 ## License
 
-**Tui** is Free Software. You are free to use, study, share, and improve it under the terms of the
+**Tūī** is Free Software. You are free to use, study, share, and improve it under the terms of the
 **GNU General Public License v3** or later.
 
 ---
