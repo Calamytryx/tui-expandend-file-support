@@ -61,6 +61,7 @@ class PrefsManager private constructor(context: Context) {
         const val SETTINGS_SECTION_LANGUAGE = "settings:section:language"
         const val SETTINGS_SECTION_THEMES = "settings:section:themes"
         const val SETTINGS_SECTION_LIST = "settings:section:list"
+        const val SETTINGS_SECTION_FOLDERS = "settings:section:folders"
 
         const val APP_UI_SCALE = "app:ui_scale"
     }
@@ -111,6 +112,7 @@ class PrefsManager private constructor(context: Context) {
                 .putBoolean(PrefKeys.SETTINGS_SECTION_LANGUAGE, true)
                 .putBoolean(PrefKeys.SETTINGS_SECTION_THEMES, true)
                 .putBoolean(PrefKeys.SETTINGS_SECTION_LIST, true)
+                .putBoolean(PrefKeys.SETTINGS_SECTION_FOLDERS, true)
 
                 .apply()
         }

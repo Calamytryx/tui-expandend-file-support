@@ -21,6 +21,62 @@
                 android:text="@string/activity_settings_label"
                 style="@style/H2" />
 
+            <!--System-->
+            <com.rama.tui.widgets.WdCollapsibleSection
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:key="SETTINGS_SECTION_SYSTEM"
+                app:header="@string/h2_system"
+                app:defaultExpanded="true">
+
+                <Button
+                    android:id="@+id/media_permission_button"
+                    android:text="Grant Media Permission"
+                    style="@style/BTN2" />
+
+                <Button
+                    android:id="@+id/storage_permission_button"
+                    android:text="Grant Storage Permission"
+                    style="@style/BTN2" />
+
+                <com.rama.tui.widgets.WdCheckbox
+                    android:id="@+id/show_system_bar"
+                    android:text="@string/checkbox_show_system_bar"
+                    style="@style/Checkbox" />
+
+                <com.rama.tui.widgets.WdCheckbox
+                    android:id="@+id/keep_screen_awake"
+                    android:text="@string/checkbox_lock_screen_from_falling_asleep"
+                    style="@style/Checkbox" />
+
+                <LinearLayout style="@style/VerticalListDivided_BG2">
+
+                    <TextView
+                        android:text="@string/label_zoom"
+                        style="@style/Text" />
+
+                    <com.rama.tui.widgets.WdRange
+                        android:id="@+id/zoom"
+                        app:valuesArray="@array/ui_scale_steps"
+                        style="@style/BlockFlow" />
+
+                </LinearLayout>
+            </com.rama.tui.widgets.WdCollapsibleSection>
+
+            <com.rama.tui.widgets.WdCollapsibleSection
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:key="SETTINGS_SECTION_FOLDERS"
+                app:header="Folders"
+                app:defaultExpanded="true">
+
+                <!--                <com.rama.tui.widgets.WdCheckbox-->
+                <!--                    android:id="@+id/keep_folder_files_together"-->
+                <!--                    android:text="@string/checkbox_keep_files_from_the_same_folder_together"-->
+                <!--                    style="@style/Checkbox" />-->
+
+            </com.rama.tui.widgets.WdCollapsibleSection>
+
             <!--Themes-->
             <com.rama.tui.widgets.WdCollapsibleSection
                 android:layout_width="match_parent"
@@ -263,38 +319,6 @@
                         style="@style/Radio" />
                 </RadioGroup>
 
-            </com.rama.tui.widgets.WdCollapsibleSection>
-
-            <!--System-->
-            <com.rama.tui.widgets.WdCollapsibleSection
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:key="SETTINGS_SECTION_SYSTEM"
-                app:header="@string/h2_system"
-                app:defaultExpanded="true">
-
-                <com.rama.tui.widgets.WdCheckbox
-                    android:id="@+id/show_system_bar"
-                    android:text="@string/checkbox_show_system_bar"
-                    style="@style/Checkbox" />
-
-                <com.rama.tui.widgets.WdCheckbox
-                    android:id="@+id/keep_screen_awake"
-                    android:text="@string/checkbox_lock_screen_from_falling_asleep"
-                    style="@style/Checkbox" />
-
-                <LinearLayout style="@style/VerticalListDivided_BG2">
-
-                    <TextView
-                        android:text="@string/label_zoom"
-                        style="@style/Text" />
-
-                    <com.rama.tui.widgets.WdRange
-                        android:id="@+id/zoom"
-                        app:valuesArray="@array/ui_scale_steps"
-                        style="@style/BlockFlow" />
-
-                </LinearLayout>
             </com.rama.tui.widgets.WdCollapsibleSection>
 
             <!--Language-->
