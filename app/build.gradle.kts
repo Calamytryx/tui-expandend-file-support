@@ -15,7 +15,7 @@ android {
         applicationId = "com.rama.tui"
         minSdk = 21
         targetSdk = 36
-        versionCode = 5
+        versionCode = 6
         versionName = "$currentYear.$versionCode"
     }
 
@@ -45,6 +45,10 @@ android {
             applicationIdSuffix = ".beta"
             versionNameSuffix = "-beta"
             isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
             signingConfig = signingConfigs.getByName("debug")
         }
         debug {
