@@ -63,7 +63,7 @@ data class Track(
 
         private fun String.splitComma() = split(",").map { it.trim() }.filter { it.isNotEmpty() }
 
-        val supported = setOf(
+        val AUDIO_EXTENSIONS = setOf(
     "mp3", "m4a", "aac", "flac", "ogg", "wav", "aiff", "wma", "alac", "ape", "wv", "tta", "dsf", "dff", "opus", "amr", "mka", "mp4"
 )
     }
